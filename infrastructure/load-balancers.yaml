@@ -52,52 +52,6 @@ Resources:
       Port: 80
       Protocol: HTTP
 
-  FrontendTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: !Sub ${EnvironmentName}-frontend-target-group
-      VpcId: !Ref VPC
-      Port: 80
-      Protocol: HTTP
-
-  BackendTargetGroup:
-    Type: AWS::ElasticLoadBalancingV2::TargetGroup
-    Properties:
-      Name: !Sub ${EnvironmentName}-backend-target-group
-      VpcId: !Ref VPC
-      Port: 80
-      Protocol: HTTP
-
-  FrontendTargetGroupListenerRule:
-    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref FrontendTargetGroup
-      Conditions:
-        - Field: path-pattern
-          PathPatternConfig:
-            HttpHeaderName: User-Agent
-            Values:
-              - '/*'
-      ListenerArn: !Ref LoadBalancerListener
-      Priority: 2
-
-  BackendTargetGroupListenerRule:
-    Type: 'AWS::ElasticLoadBalancingV2::ListenerRule'
-    Properties:
-      Actions:
-        - Type: forward
-          TargetGroupArn: !Ref BackendTargetGroup
-      Conditions:
-        - Field: path-pattern
-          PathPatternConfig:
-            HttpHeaderName: User-Agent
-            Values:
-              - '/api/*'
-      ListenerArn: !Ref LoadBalancerListener
-      Priority: 1
-
 Outputs:
   LoadBalancer:
     Description: A reference to the Application Load Balancer

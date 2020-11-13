@@ -1,5 +1,7 @@
 Description: >
 
+  Copyright; https://github.com/aws-samples/ecs-refarch-cloudformation/tree/master/infrastructure 
+
   This template deploys a VPC, with a pair of public and private subnets spread 
   across two Availabilty Zones. It deploys an Internet Gateway, with a default 
   route on the public subnets. It deploys a pair of NAT Gateways (one in each AZ), 
@@ -51,27 +53,16 @@ Resources:
       TemplateURL: https://akosfi.s3.eu-west-3.amazonaws.com/infrastructure/ecs-cluster.yaml
       Parameters:
         EnvironmentName: !Ref AWS::StackName
-        InstanceType: t2.large
+        InstanceType: t2.micro
         ClusterSize: 4
         VPC: !GetAtt VPC.Outputs.VPC
         SecurityGroup: !GetAtt SecurityGroups.Outputs.ECSHostSecurityGroup
         Subnets: !GetAtt VPC.Outputs.PrivateSubnets
 
-  ProductService:
+  FrontendService:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/product-service/service.yaml
-      Parameters:
-        VPC: !GetAtt VPC.Outputs.VPC
-        Cluster: !GetAtt ECS.Outputs.Cluster
-        DesiredCount: 2
-        Listener: !GetAtt ALB.Outputs.Listener
-        Path: /products
-
-  WebsiteService:
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/services/website-service/service.yaml
+      TemplateURL: https://akosfi.s3.eu-west-3.amazonaws.com/services/frontend.yaml
       Parameters:
         VPC: !GetAtt VPC.Outputs.VPC
         Cluster: !GetAtt ECS.Outputs.Cluster
@@ -79,13 +70,24 @@ Resources:
         ProductServiceUrl:
           !Join ["/", [!GetAtt ALB.Outputs.LoadBalancerUrl, "products"]]
         Listener: !GetAtt ALB.Outputs.Listener
-        Path: /
+        Path: "*"
         ECSServiceAutoScalingRoleARN: !GetAtt ECS.Outputs.ECSServiceAutoScalingRole
+
+  BackendService:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: https://akosfi.s3.eu-west-3.amazonaws.com/services/backend.yaml
+      Parameters:
+        VPC: !GetAtt VPC.Outputs.VPC
+        Cluster: !GetAtt ECS.Outputs.Cluster
+        DesiredCount: 2
+        Listener: !GetAtt ALB.Outputs.Listener
+        Path: /api/*
 
   LifecycleHook:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: https://s3.amazonaws.com/ecs-refarch-cloudformation/infrastructure/lifecyclehook.yaml
+      TemplateURL: https://akosfi.s3.eu-west-3.amazonaws.com/infrastructure/lifecyclehook.yaml
       Parameters:
         Cluster: !GetAtt ECS.Outputs.Cluster
         ECSAutoScalingGroupName: !GetAtt ECS.Outputs.ECSAutoScalingGroupName

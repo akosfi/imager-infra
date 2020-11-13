@@ -40,3 +40,11 @@ aws s3api put-object-acl --bucket "$AWS_S3_BUCKET_NAME" --key "infrastructure/ec
 lifecyclehook_url="s3://$AWS_S3_BUCKET_NAME/infrastructure/lifecyclehook.yaml"
 aws s3 cp "./infrastructure/lifecyclehook.yaml" "$lifecyclehook_url"
 aws s3api put-object-acl --bucket "$AWS_S3_BUCKET_NAME" --key "infrastructure/lifecyclehook.yaml" --grant-read uri=http://acs.amazonaws.com/groups/global/AllUsers
+
+frontend_service_url="s3://$AWS_S3_BUCKET_NAME/services/frontend.yaml"
+aws s3 cp "./services/frontend.yaml" "$frontend_service_url"
+aws s3api put-object-acl --bucket "$AWS_S3_BUCKET_NAME" --key "services/frontend.yaml" --grant-read uri=http://acs.amazonaws.com/groups/global/AllUsers
+
+backend_service_url="s3://$AWS_S3_BUCKET_NAME/services/backend.yaml"
+aws s3 cp "./services/backend.yaml" "$backend_service_url"
+aws s3api put-object-acl --bucket "$AWS_S3_BUCKET_NAME" --key "services/backend.yaml" --grant-read uri=http://acs.amazonaws.com/groups/global/AllUsers
