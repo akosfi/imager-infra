@@ -33,6 +33,7 @@ Resources:
       Role: !Ref ServiceRole
       DesiredCount: !Ref DesiredCount
       TaskDefinition: !Ref TaskDefinition
+      ServiceName: !Join [ "-", [ !Ref Cluster, "backend-service" ] ]
       LoadBalancers:
         - ContainerName: "imager-backend"
           ContainerPort: 8080

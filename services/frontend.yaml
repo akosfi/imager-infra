@@ -47,6 +47,7 @@ Resources:
       Role: !Ref ServiceRole
       DesiredCount: !Ref DesiredCount
       TaskDefinition: !Ref TaskDefinition
+      ServiceName: !Join ["-", [!Ref Cluster, "frontend-service"]]
       LoadBalancers:
         - ContainerName: "imager-frontend"
           ContainerPort: 3000
